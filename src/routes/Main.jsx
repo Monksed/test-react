@@ -1,15 +1,26 @@
 import React, { useMemo, useState, useCallback } from "react";
-import { useNavigate, useParams } from "react-router-dom";
 import "./Main.scss";
 import HelloCard from "../components/HelloCard";
 import InstructionCard from "../components/InstructionCard";
 
 const MainPage = () => {
-  const navigate = useNavigate();
-  const params = useParams();
+  const [login, setLogin] = useState("");
+  const [password, setPassword] = useState("");
+
+  const [showLogin, setShowLogin] = useState("");
+  const [showPassword, setShowPassword] = useState("");
+
+  const sendData = () => {
+    setShowLogin(login);
+    setShowPassword(password);
+  };
 
   const texts = useMemo(
-    () => ["hello world", "привет мир", "здравствуй, реальность"],
+() => [
+      "State",
+      "Асинхронное программирование",
+      "здравствуй, реальность",
+    ],
     []
   );
 
@@ -24,15 +35,36 @@ const MainPage = () => {
   }, [texts]);
 
   return (
-    <>
       <div className="main">
         <div className="main__container">
           <HelloCard text={textHello} onNext={handleNext} />
+
+        {showLogin} / {showPassword}
+        <br />
+
+          <input
+            value={login}
+            onChange={(e) => {setLogin(e.target.value)}}
+            type="text"
+            placeholder="Введите логин"
+            className="input"
+          />
+
+          <input
+            value={password}
+            onChange={(e) => {setPassword(e.target.value)}}
+            type="password"
+            placeholder="Введите пароль"
+            className="input"
+          />
+          
+          <div className="demo-row">
+            <button className="btn btn-primary" onClick={sendData}>Отправить</button>
+          </div>
+
           <InstructionCard />
         </div>
       </div>
-    </>
   );
 };
-
 export default MainPage;
