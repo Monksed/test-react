@@ -1,3 +1,4 @@
+import axios from "axios";
 import React, { createContext, useContext, useState } from "react";
 
 const CartContext = createContext();
@@ -9,7 +10,22 @@ export const useCart = () => {
 export const CartProvider = ({ children }) => {
   const [cartCount, setCartCount] = useState(0);
 
-  const addToCart = () => setCartCount(prev => prev + 1);
+  const addToCart = async (productId) => {
+    try {
+      const response = await axios.post(`http://localhost:5023/api/Product/Buy/${productId}`);
+      if (response.status === 200) {
+        setCartCount(prev => prev + 1);
+        alert("Товар добавлен в корзину");
+      }
+    } catch (e) {
+      if (e.response?.status === 400) {
+        alert("Товара нет в наличии");
+      } else {
+        alert("Ошибка при добавлении товара");
+      }
+    }
+  };
+
   const resetCart = () => setCartCount(0);
 
   return (

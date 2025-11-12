@@ -3,13 +3,14 @@ import ProductCard from '../components/ProductCard';
 import { useCart } from '../contexts/CartContext';
 import './Main.scss';
 import { FaShoppingCart } from "react-icons/fa";
+import axios from 'axios';
 
 const CartIcon = () => {
   const { cartCount, resetCart } = useCart();
 
   return (
     <div className="cart-icon" onClick={resetCart}>
-      <FaShoppingCart className="cart-icon__icon"/>
+      <FaShoppingCart className="cart-icon__icon" />
       {cartCount > 0 && <span className="cart-icon__count">{cartCount}</span>}
     </div>
   );
@@ -18,15 +19,26 @@ const CartIcon = () => {
 const MainPage = () => {
   const { addToCart } = useCart();
   const [products, setProducts] = useState([]);
+  const [isLoad, setIsLoad] = useState(true);
 
   useEffect(() => {
-    setProducts([
-      { id: 1, name: 'Rick Owens', price: 55000, image: '/images/rick.png', bonus: 550 },
-      { id: 2, name: 'New Balance 2002R', price: 15000, image: '/images/2002r.png', bonus: 150 },
-      { id: 3, name: 'Adidas Gazelle', price: 15000, image: '/images/gazelle.png', bonus: 150 },
-      { id: 4, name: 'Air Jordan 4', price: 38000, image: '/images/aj4.png', bonus: 380 },
-    ]);
+    const loadProducts = async () => {
+      try {
+        const response = await axios.get('http://localhost:5023/api/Product/All');
+        setProducts(response.data);
+      } catch (error) {
+        console.error("Ошибка при загрузке товаров:", error);
+      } finally {
+        setIsLoad(false);
+      }
+    };
+
+    loadProducts();
   }, []);
+
+  if (isLoad) {
+    return <div className="product-card loading"><p>Загрузка...</p></div>;
+  }
 
   return (
     <div className="main">
@@ -35,10 +47,13 @@ const MainPage = () => {
         {products.map(product => (
           <ProductCard
             key={product.id}
-            imageSrc={product.image}
-            title={product.name}
+            id={product.id}
+            image={product.image}
+            title={product.title}
+            description={product.description}
             price={product.price}
-            bonus={product.bonus}
+            quantity={product.quantity}
+            bonus={Math.floor(product.price * 0.1)}
             onAddToCart={addToCart}
           />
         ))}
